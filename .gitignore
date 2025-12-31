@@ -1,0 +1,11 @@
+__pycache__
+.vscode
+.env
+application/app/auth/firebase_app.json
+application/app/auth/firebase_pos.json
+
+# Logs
+logs/
+application/logs/
+*.log
+*.log.*

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashfree Payment Test Client</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+</head>
+<body>
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Configuration</h2>
+                <span class="close" onclick="closeSettings()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="apiBaseUrl"><i class="fas fa-server"></i>API Base URL</label>
+                    <input type="url" id="apiBaseUrl" value="http://localhost:8000" placeholder="http://localhost:8000">
+                </div>
+                <div class="form-group">
+                    <label for="cashfreeAppId"><i class="fas fa-key"></i>Cashfree App ID</label>
+                    <input type="text" id="cashfreeAppId" placeholder="Enter your Cashfree App ID">
+                </div>
+                <div class="form-group">
+                    <label for="cashfreeSecretKey"><i class="fas fa-key"></i>Cashfree Secret Key</label>
+                    <input type="password" id="cashfreeSecretKey" placeholder="Enter your Cashfree Secret Key">
+                </div>
+                <div class="form-group">
+                    <label for="firebaseToken"><i class="fas fa-shield-alt"></i>Firebase ID Token</label>
+                    <input type="password" id="firebaseToken" placeholder="Enter your Firebase ID Token">
+                    <small>Required for authentication. Get this from your Firebase app.</small>
+                </div>
+                <button onclick="saveSettings()" class="save-btn"><i class="fas fa-save"></i> Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <!-- Main Content Area (70%) -->
+        <div class="content-area">
+            <div class="app-container">
+                <!-- Header with Settings -->
+                <header class="app-header">
+                    <div class="header-content">
+                        <div class="logo">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h1>Cashfree Payment Test</h1>
+                        </div>
+                        <button class="settings-btn" onclick="openSettings()">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                    <p class="subtitle">Test your Cashfree integration with a beautiful journey</p>
+                </header>
+
+        <!-- Journey Progress -->
+        <div class="journey-progress">
+            <div class="step active" id="step1">
+                <div class="step-circle">1</div>
+                <span>Create Order</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="step2">
+                <div class="step-circle">2</div>
+                <span>Payment</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="step3">
+                <div class="step-circle">3</div>
+                <span>Complete</span>
+            </div>
+        </div>
+
+        <!-- Step 1: Create Order -->
+        <div class="journey-step active" id="orderStep">
+            <div class="glass-card">
+                <div class="card-header">
+                    <i class="fas fa-shopping-bag"></i>
+                    <h2>Create Your Order</h2>
+                    <p>Fill in the order details to get started</p>
+                </div>
+                <form id="orderForm" class="order-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customerId"><i class="fas fa-user"></i>Customer ID</label>
+                            <input type="text" id="customerId" value="2CN3aYJnaGXpaguuctWAubZnKKp1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerName"><i class="fas fa-user-tag"></i>Customer Name</label>
+                            <input type="text" id="customerName" value="Test Customer">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="facilityId"><i class="fas fa-warehouse"></i>Facility ID</label>
+                            <input type="text" id="facilityId" value="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="facilityName"><i class="fas fa-building"></i>Facility Name</label>
+                            <input type="text" id="facilityName" value="ROZANA_TEST_WH1" required>
+                        </div>
+                    </div>
+
+                    <div class="section-header">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Delivery Address</h3>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName"><i class="fas fa-user"></i>Full Name</label>
+                            <input type="text" id="fullName" value="Test Customer" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phoneNumber"><i class="fas fa-phone"></i>Phone Number</label>
+                            <input type="tel" id="phoneNumber" value="9123456789" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addressLine1"><i class="fas fa-home"></i>Address Line 1</label>
+                        <input type="text" id="addressLine1" value="123 Main Street" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addressLine2"><i class="fas fa-building"></i>Address Line 2</label>
+                        <input type="text" id="addressLine2" value="Apt 4B">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city"><i class="fas fa-city"></i>City</label>
+                            <input type="text" id="city" value="Bangalore" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="state"><i class="fas fa-map"></i>State</label>
+                            <input type="text" id="state" value="Karnataka" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postalCode"><i class="fas fa-mail-bulk"></i>Postal Code</label>
+                            <input type="text" id="postalCode" value="56001" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="country"><i class="fas fa-globe"></i>Country</label>
+                            <input type="text" id="country" value="INDIA" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addressType"><i class="fas fa-tag"></i> Address Type:</label>
+                        <select id="addressType" required>
+                            <option value="home">🏠 Home</option>
+                            <option value="work" selected>🏢 Work</option>
+                            <option value="other">📍 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="section-header">
+                        <i class="fas fa-box"></i>
+                        <h3>Order Items</h3>
+                        <button type="button" class="btn-secondary" onclick="addItem()">
+                            <i class="fas fa-plus"></i> Add Item
+                        </button>
+                    </div>
+                    
+                    <div id="orderItems" class="order-items">
+                        <!-- Items will be added here -->
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="totalAmount"><i class="fas fa-money-bill-wave"></i>Total Amount (₹)</label>
+                            <input type="number" id="totalAmount" step="0.01" min="0" value="28.5" required readonly>
+                            <small>This will be auto-calculated from items</small>
+                        </div>
+                    </div>
+
+                    <!-- Split Payment Section -->
+                    <div class="form-group">
+                        <div class="split-payment-header">
+                            <label><i class="fas fa-money-bill-transfer"></i>Split Payment</label>
+                            <button type="button" class="btn-secondary" id="addPaymentMethod">
+                                <i class="fas fa-plus"></i> Add Payment Method
+                            </button>
+                        </div>
+                        <div id="paymentMethodsContainer">
+                            <!-- Payment methods will be added here -->
+                        </div>
+                        <div class="payment-summary">
+                            <div class="payment-total">
+                                <span>Total Allocated:</span>
+                                <span id="totalAllocated">₹0.00</span>
+                            </div>
+                            <div class="payment-remaining">
+                                <span>Remaining:</span>
+                                <span id="remainingAmount">₹0.00</span>
+                            </div>
+                        </div>
+                        <div id="paymentError" class="error-message" style="display: none;">
+                            Total payment methods must equal the order total amount
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="journey-btn">
+                            <i class="fas fa-arrow-right"></i>
+                            Create Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step 2: Payment -->
+        <div class="journey-step" id="paymentStep">
+            <div class="glass-card">
+                <div class="card-header">
+                    <i class="fas fa-credit-card"></i>
+                    <h2>Payment Processing</h2>
+                    <p>Complete your payment securely</p>
+                </div>
+                <div class="payment-details">
+                    <div class="order-summary">
+                        <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+                        <div id="orderSummary">
+                            <!-- Order details will be populated here -->
+                        </div>
+                    </div>
+                    <div class="payment-actions">
+                        <button id="payButton" class="journey-btn">
+                            <i class="fas fa-lock"></i>
+                            Pay Securely with Cashfree
+                        </button>
+                        <p class="security-note">
+                            <i class="fas fa-shield-alt"></i>
+                            Your payment is secured by Cashfree's 256-bit SSL encryption
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Success -->
+        <div class="journey-step" id="successStep">
+            <div class="glass-card success-card">
+                <div class="success-animation">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Payment Successful!</h2>
+                <p>Your order has been placed successfully</p>
+                <div id="successDetails">
+                    <!-- Success details will be populated here -->
+                </div>
+                <div class="success-actions">
+                    <button onclick="resetJourney()" class="journey-btn">
+                        <i class="fas fa-plus"></i>
+                        Create Another Order
+                    </button>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+
+        <!-- Sidebar (30%) -->
+        <div class="sidebar">
+            <div class="logs-container">
+                <div class="logs-header">
+                    <h3><i class="fas fa-terminal"></i> Activity Logs</h3>
+                    <div class="logs-controls">
+                        <button onclick="clearLogs()" class="btn-clear">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button onclick="toggleLogs()" class="btn-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="logs-content">
+                    <pre id="logs"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

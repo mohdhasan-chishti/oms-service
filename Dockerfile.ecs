@@ -1,0 +1,42 @@
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1
+WORKDIR /application
+
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /application/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY application /application
+
+# Copy the .env file baked in at build time
+ARG ENV_FILE=.env
+COPY ${ENV_FILE} /application/.env
+
+# Copy Firebase credential JSON files baked in at build time
+ARG FIREBASE_APP_FILE=app/auth/firebase_app.json
+ARG FIREBASE_POS_FILE=app/auth/firebase_pos.json
+COPY ${FIREBASE_APP_FILE} /application/app/auth/firebase_app.json
+COPY ${FIREBASE_POS_FILE} /application/app/auth/firebase_pos.json
+
+# Create entrypoint script to load .env at runtime and start the app
+RUN echo '#!/bin/bash' > /application/docker-entrypoint.sh && \
+    echo 'set -a' >> /application/docker-entrypoint.sh && \
+    echo 'if [ -f /application/.env ]; then' >> /application/docker-entrypoint.sh && \
+    echo '  echo "Loading environment variables from .env..."' >> /application/docker-entrypoint.sh && \
+    echo '  source /application/.env' >> /application/docker-entrypoint.sh && \
+    echo 'else' >> /application/docker-entrypoint.sh && \
+    echo '  echo ".env file not found."' >> /application/docker-entrypoint.sh && \
+    echo 'fi' >> /application/docker-entrypoint.sh && \
+    echo 'set +a' >> /application/docker-entrypoint.sh && \
+    echo 'exec "$@"' >> /application/docker-entrypoint.sh && \
+    chmod +x /application/docker-entrypoint.sh
+
+ENTRYPOINT ["bash", "/application/docker-entrypoint.sh"]
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
